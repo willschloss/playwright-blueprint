@@ -27,8 +27,17 @@ test.describe("SEO basics", () => {
       });
 
       await test.step("Meta description is present and non-empty", async () => {
-        const description = await page.locator('meta[name="description"]').getAttribute("content");
-        expect.soft(description?.trim().length ?? 0, "meta description present").toBeGreaterThan(0);
+        const description = page.locator('meta[name="description"]');
+        // Check existence via count() first — count() never waits, whereas
+        // getAttribute() on a tag that doesn't exist retries for the full
+        // test timeout hoping it'll appear, turning a real "it's missing"
+        // finding into a 30s hang instead of a fast, readable failure.
+        const tagCount = await description.count();
+        expect.soft(tagCount, "meta description tag present").toBeGreaterThan(0);
+        if (tagCount > 0) {
+          const content = await description.first().getAttribute("content");
+          expect.soft(content?.trim().length ?? 0, "meta description non-empty").toBeGreaterThan(0);
+        }
       });
 
       await test.step("Viewport meta tag is present (mobile indexing signal)", async () => {
@@ -40,7 +49,7 @@ test.describe("SEO basics", () => {
       });
 
       await test.step("Exactly one <h1> on the page", async () => {
-        await expect(page.locator("h1")).toHaveCount(1);
+        await expect.soft(page.locator("h1")).toHaveCount(1);
       });
     });
   }

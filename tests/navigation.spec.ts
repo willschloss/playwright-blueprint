@@ -35,11 +35,14 @@ test.describe("Header navigation", () => {
   }) => {
     const header = new HeaderPage(page);
     const { desktopViewport, mobileViewport } = siteConfig.nav;
+    // Use the first configured nav item as a representative link — there's no
+    // single "nav container" landmark to assert on generically (see headerPage.ts).
+    const sampleLink = header.navLink(siteConfig.nav.items[0].label);
 
     await test.step("Desktop viewport — full nav visible, toggle hidden", async () => {
       await page.setViewportSize(desktopViewport);
       await header.goto("/");
-      await expect(header.nav).toBeVisible();
+      await expect(sampleLink).toBeVisible();
       await expect(header.mobileMenuToggle).not.toBeVisible();
     });
 
@@ -50,12 +53,12 @@ test.describe("Header navigation", () => {
 
     await test.step("Tapping the toggle reveals the nav", async () => {
       await header.openMobileMenu();
-      await expect(header.nav).toBeVisible();
+      await expect(sampleLink).toBeVisible();
     });
 
     await test.step("Resizing back to desktop restores the full nav", async () => {
       await page.setViewportSize(desktopViewport);
-      await expect(header.nav).toBeVisible();
+      await expect(sampleLink).toBeVisible();
       await expect(header.mobileMenuToggle).not.toBeVisible();
     });
   });
