@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { siteConfig } from "./config/site.config";
 
 try {
   // Optional — a fresh clone of this blueprint may not have a .env yet.
@@ -10,12 +11,12 @@ try {
 /**
  * Playwright config for the test blueprint.
  *
- * Set PW_BASE_URL to point this at whichever site the blueprint has been
- * copied into. The rest of the per-site knobs (routes, nav items, form
- * fields, SEO/accessibility pages, ...) live in config/site.config.ts.
+ * baseURL comes from config/site.config.ts (which itself falls back to
+ * PW_BASE_URL, then a hardcoded default) — that file is the single source of
+ * truth for which site this suite targets. Don't hardcode a URL here too;
+ * a second default here is exactly what caused baseURL to silently drift
+ * back to localhost once PW_BASE_URL was unset.
  */
-const BASE_URL = process.env.PW_BASE_URL ?? "http://localhost:3000";
-
 export default defineConfig({
   testDir: "./tests",
   // Fail the build on CI if test.only is left in the source.
@@ -27,7 +28,7 @@ export default defineConfig({
     : [["html", { open: "never" }], ["list"]],
 
   use: {
-    baseURL: BASE_URL,
+    baseURL: siteConfig.baseURL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
