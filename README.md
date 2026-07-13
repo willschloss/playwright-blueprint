@@ -38,14 +38,22 @@ npm run test:sunshine    # SITE=sunshine, tests sunshinetechserv.com
 npm test                 # SITE unset -> defaults to "triad"
 ```
 
-To add another site: copy `config/sites/triad.ts` to `config/sites/<name>.ts`,
-fill in its settings (see `config/sites/types.ts` for what each field means —
-the shape is the same for every site), add it to the `sites` map at the top
-of `config/site.config.ts`, and add a matching `test:<name>` script to
-`package.json` if you want the shortcut. Nothing else in the repo — no page
-object, fixture, or spec — needs to change; they all still just import
-`siteConfig` from `config/site.config.ts` and never know which real site is
-behind it.
+To add another site, run:
+
+```bash
+npm run add-site -- --name <shortname> --url https://example.com
+```
+
+This scaffolds `config/sites/<name>.ts` with a `TODO` on every field, wires it
+into the `sites` map in `config/site.config.ts`, and adds a `test:<name>` npm
+script — the three mechanical steps that are easy to get subtly wrong by hand
+and don't need a human to do at all. It deliberately does *not* guess at the
+site's real nav links, form fields, or pages to check — open the scaffolded
+file and fill those in by actually looking at the live site (or ask an AI
+session with browser access to do it, the way triad.tech and Sunshine's
+configs were filled in). Nothing else in the repo — no page object, fixture,
+or spec — needs to change; they all still just import `siteConfig` from
+`config/site.config.ts` and never know which real site is behind it.
 
 ## Adapting this to a new site
 

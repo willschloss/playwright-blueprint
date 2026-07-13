@@ -12,6 +12,7 @@
     "test:a11y": "playwright test --grep @a11y",
     "test:triad": "SITE=triad playwright test",
     "test:sunshine": "SITE=sunshine playwright test",
+    "add-site": "node scripts/add-site.mjs",
     "report": "playwright show-report",
     "codegen": "playwright codegen ${PW_BASE_URL:-http://localhost:3000}"
   },

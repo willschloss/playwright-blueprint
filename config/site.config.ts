@@ -11,10 +11,13 @@
  *
  * or use the matching npm script (npm run test:triad / npm run test:sunshine).
  *
- * To add a new site: copy config/sites/triad.ts to config/sites/<name>.ts,
- * fill in its SiteConfig (see config/sites/types.ts for what each field
- * means), then add it to the `sites` map below. See README.md's "Testing
- * multiple sites" section for the full walkthrough.
+ * To add a new site, run:
+ *
+ *   npm run add-site -- --name <shortname> --url https://example.com
+ *
+ * which scaffolds config/sites/<name>.ts, registers it in the `sites` map
+ * below, and adds a matching npm script — see README.md's "Testing multiple
+ * sites" section for the full walkthrough.
  */
 
 import { siteConfig as triad } from "./sites/triad";
