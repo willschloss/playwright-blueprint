@@ -1,0 +1,21 @@
+{
+  "name": "playwright-blueprint",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Reusable, config-driven Playwright end-to-end test blueprint. Drop into any Triad web project and point config/site.config.ts at it to get smoke, navigation, forms, SEO, accessibility, responsive, and quality checks out of the box.",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:a11y": "playwright test --grep @a11y",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen ${PW_BASE_URL:-http://localhost:3000}"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^20"
+  }
+}
