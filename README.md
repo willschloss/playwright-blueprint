@@ -25,16 +25,38 @@ npx playwright install   # download the browser binaries (first time only)
 cp .env.example .env     # then set PW_BASE_URL
 ```
 
+## Testing multiple sites
+
+`config/site.config.ts` no longer holds a site's settings directly — it picks
+one out of `config/sites/` based on the `SITE` environment variable, so you
+can keep more than one site's settings around instead of overwriting one every
+time you point this at somewhere new:
+
+```bash
+npm run test:triad       # SITE=triad, tests triad.tech
+npm run test:sunshine    # SITE=sunshine, tests sunshinetechserv.com
+npm test                 # SITE unset -> defaults to "triad"
+```
+
+To add another site: copy `config/sites/triad.ts` to `config/sites/<name>.ts`,
+fill in its settings (see `config/sites/types.ts` for what each field means —
+the shape is the same for every site), add it to the `sites` map at the top
+of `config/site.config.ts`, and add a matching `test:<name>` script to
+`package.json` if you want the shortcut. Nothing else in the repo — no page
+object, fixture, or spec — needs to change; they all still just import
+`siteConfig` from `config/site.config.ts` and never know which real site is
+behind it.
+
 ## Adapting this to a new site
 
-1. Edit **`config/site.config.ts`**: set `baseURL`, `smokeRoutes`, `nav.items`,
-   `contactForm`, `seo.pagesToCheck`, `accessibility.pagesToCheck`, and
-   `linkCheck.pagesToCrawl` to match the real site.
-2. Run `npm test` — the suites that now have config will run; the rest stay skipped.
+1. Add a **`config/sites/<name>.ts`** (see above): set `baseURL`, `smokeRoutes`,
+   `nav.items`, `contactForm`, `seo.pagesToCheck`, `accessibility.pagesToCheck`,
+   and `linkCheck.pagesToCrawl` to match the real site.
+2. Run it with `SITE=<name> npm test` — the suites that now have config will run; the rest stay skipped.
 3. If the header/footer/contact form markup doesn't match the generic ARIA-role
    assumptions in `pages/headerPage.ts`, `pages/footerPage.ts`, or
    `pages/contactFormPage.ts`, adjust the locator there — every spec that uses it
-   updates automatically.
+   updates automatically, for every site.
 4. If the site needs authenticated tests, add a `setup/*.setup.ts` that logs in and
    saves `storageState`, then wire `dependencies: ["Setup"]` into the relevant
    projects in `playwright.config.ts`. See `triadtest/setup/auth.setup.ts` for the
@@ -62,7 +84,11 @@ npx playwright test tests/smoke.spec.ts
 ## Layout
 
 ```
-config/site.config.ts   # the per-site knobs every suite reads from
+config/site.config.ts   # picks the active site (via SITE env var) from config/sites/
+config/sites/
+  types.ts               # the SiteConfig shape every site file follows
+  triad.ts                # triad.tech's settings
+  sunshine.ts             # sunshinetechserv.com's settings
 playwright.config.ts    # baseURL, browser matrix, reporters
 pages/                   # generic, reusable page objects
   headerPage.ts          # nav landmark, logo, mobile toggle
