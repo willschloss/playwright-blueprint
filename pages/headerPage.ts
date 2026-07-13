@@ -34,11 +34,16 @@ export class HeaderPage {
 
   /**
    * Clicks a primary nav link by its accessible name. Opens the mobile menu
-   * first if the link isn't currently visible (collapsed/narrow viewport).
+   * first when the hamburger toggle is on screen (collapsed/narrow viewport).
+   * Deciding this from the *link's* own visibility isn't reliable: some sites
+   * (triad.tech included) keep collapsed nav links in the DOM with a normal
+   * bounding box and only clip them via an ancestor's height/overflow, so
+   * Playwright reports the link "visible" even while the menu is closed —
+   * checking the toggle instead avoids that false positive.
    */
   async openNav(label: string) {
     const link = this.navLink(label);
-    if (!(await link.isVisible())) {
+    if (await this.mobileMenuToggle.isVisible()) {
       await this.mobileMenuToggle.click();
     }
     await link.click();
