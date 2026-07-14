@@ -134,3 +134,6 @@ site-wide infrastructure checks rather than single-feature interactions.
 `.github/workflows/playwright.yml` runs the suite on push/PR and on a daily
 schedule. Set the `PW_BASE_URL` repository/workflow variable to the environment
 you want CI to target.
+
+See [TESTS.md](TESTS.md) for what each suite checks and why, and
+[FINDINGS.md](FINDINGS.md) for the latest run's results against the live site.
