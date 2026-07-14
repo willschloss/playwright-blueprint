@@ -7,9 +7,8 @@
  * Switch sites with the SITE environment variable:
  *
  *   SITE=sunshine npm test      # test sunshinetechserv.com
- *   npm test                    # SITE unset -> defaults to "triad"
  *
- * or use the matching npm script (npm run test:triad / npm run test:sunshine).
+ * or use the matching npm script (npm run test:sunshine).
  *
  * To add a new site, run:
  *
@@ -20,14 +19,13 @@
  * sites" section for the full walkthrough.
  */
 
-import { siteConfig as triad } from "./sites/triad";
 import { siteConfig as sunshine } from "./sites/sunshine";
 
 export * from "./sites/types";
 
-const sites = { triad, sunshine };
+const sites = { sunshine };
 
-const requested = process.env.SITE ?? "triad";
+const requested = process.env.SITE ?? "sunshine";
 
 if (!(requested in sites)) {
   throw new Error(
