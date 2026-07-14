@@ -1,10 +1,12 @@
 # Findings — triad.tech, 2026-07-14
 
-This is a plain-language writeup of what the CI pipeline (see [README.md](README.md#ci))
-found when it ran the full suite against `https://triad.tech` on 2026-07-14, in
-GitHub Actions run [`b807b9f`](https://github.com/willschloss/playwright-blueprint/actions).
-Each item below traces back to the test suite that caught it — see
-[TESTS.md](TESTS.md) for what each suite is generally checking and why.
+This is a plain-language writeup of what running the full suite against
+`https://triad.tech` found on 2026-07-14 (desktop and mobile Chrome, local
+run — not tied to a specific CI run). Each item below traces back to the test
+suite that caught it — see [TESTS.md](TESTS.md) for what each suite is
+generally checking and why. Every claim below was cross-checked directly
+against the live site's raw HTML, not just the test output, after an earlier
+version of this document overstated the `<h1>` finding (see below).
 
 **Result: 97 passed, 12 failed, 1 flaky, 6 skipped.** Every failure is a real,
 reproducible issue on the live site — nothing here is a bug in the test code
@@ -13,8 +15,10 @@ viewports).
 
 ## SEO findings — `seo.spec.ts`
 
-All three checked pages (`/`, `/services`, `/contact`) are missing the same
-three things:
+All three checked pages (`/`, `/services`, `/contact`) are missing a meta
+description and a canonical link. The `<h1>` finding is narrower — only the
+homepage lacks one; `/services` ("What We Do") and `/contact` ("Start the
+conversation.") each have exactly one.
 
 | Check | Result |
 |---|---|
@@ -22,7 +26,7 @@ three things:
 | `<meta name="description">` present | ❌ Missing on all 3 pages |
 | `<meta name="viewport">` present | ✅ Pass |
 | Canonical `<link rel="canonical">` present | ❌ Missing on all 3 pages |
-| Exactly one `<h1>` on the page | ❌ Missing on all 3 pages (zero found, not just miscounted) |
+| Exactly one `<h1>` on the page | ❌ Missing on `/` only — `/services` and `/contact` each have one |
 
 **Why this matters:** A meta description is the snippet of text search engines
 show under the page title in results — without one, Google generates its own
@@ -31,7 +35,8 @@ previews may show nothing useful. A canonical link tells search engines which
 URL is the "real" one when a page is reachable multiple ways, preventing
 duplicate-content penalties. A missing `<h1>` means there's no clear single
 heading marking what the page is actually about, both for search engines and
-for screen reader users who navigate by heading structure.
+for screen reader users who navigate by heading structure — on this site,
+that gap is limited to the homepage.
 
 ## Accessibility findings — `accessibility.spec.ts`
 
@@ -42,9 +47,9 @@ same three pages, desktop and mobile. Recurring issues, all rated
 - **No `<main>` landmark** (`landmark-one-main`) — the page has no element
   marking where its main content begins, which matters for screen-reader
   users who jump straight to content via a "skip to main" shortcut.
-- **No `<h1>`** (`page-has-heading-one`) — same missing heading as the SEO
-  finding above; it's a double hit because it affects both rankings and
-  accessibility.
+- **No `<h1>`** (`page-has-heading-one`, found on `/` only) — same missing
+  heading as the SEO finding above; it's a double hit on the homepage because
+  it affects both rankings and accessibility there.
 - **Content not wrapped in landmark regions** (`region`) — between 6 and 11
   sections of content per page fall outside any semantic landmark (`<main>`,
   `<nav>`, `<header>`, `<footer>`, etc.), meaning assistive tech has no way
@@ -77,10 +82,10 @@ and both viewports, and none are in `config/site.config.ts`'s
 
 ## Bottom line
 
-The CI pipeline is doing its job: `triad.tech` is missing a meta description,
-canonical link, and `<h1>` on every page checked, and has several
-accessibility gaps (no landmark structure, one skipped heading level, and low
-color contrast on some mobile text). These are content/markup fixes on the
-live site itself, not anything wrong with this test repo. CI will keep
-reporting these as failures — an accurate, honest signal — until they're
-addressed on `triad.tech`.
+The suite is doing its job: `triad.tech` is missing a meta description and
+canonical link on every page checked, is missing an `<h1>` on the homepage,
+and has several accessibility gaps (no landmark structure, one skipped
+heading level, and low color contrast on some mobile text). These are
+content/markup fixes on the live site itself, not anything wrong with this
+test repo. This suite will keep reporting these as failures — an accurate,
+honest signal — until they're addressed on `triad.tech`.
