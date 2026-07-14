@@ -4,7 +4,9 @@ export const siteConfig: SiteConfig = {
   siteName: "Triad",
   // dev.triad.tech requires auth (redirects unauthenticated users to /login);
   // the marketing site at triad.tech is what this generic suite targets.
-  baseURL: process.env.PW_BASE_URL ?? "https://triad.tech",
+  // `||` (not `??`) on purpose: GitHub Actions injects an unset repo
+  // variable as an empty string, not undefined, so `??` wouldn't fall back.
+  baseURL: process.env.PW_BASE_URL || "https://triad.tech",
 
   smokeRoutes: [
     "/",

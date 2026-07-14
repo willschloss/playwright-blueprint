@@ -2,7 +2,9 @@ import type { SiteConfig } from "./types";
 
 export const siteConfig: SiteConfig = {
   siteName: "Sunshine Technology Services",
-  baseURL: process.env.PW_BASE_URL ?? "https://sunshinetechserv.com",
+  // `||` (not `??`) on purpose: GitHub Actions injects an unset repo
+  // variable as an empty string, not undefined, so `??` wouldn't fall back.
+  baseURL: process.env.PW_BASE_URL || "https://sunshinetechserv.com",
 
   // A small, mostly single-page marketing site: everything except the news
   // page lives on "/", with the contact form embedded inline (no /contact
