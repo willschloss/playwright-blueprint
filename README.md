@@ -1,36 +1,36 @@
 # playwright-blueprint
 
-A reusable, config-driven [Playwright](https://playwright.dev) test blueprint. Every
-suite in here tests something that shows up on almost any website — a header nav,
-a footer, a contact form, meta tags, accessibility, responsive layout, broken links,
-console/network errors — so a new Triad project can start with a working test suite
-on day one instead of writing one from scratch.
+A reusable, config-driven [Playwright](https://playwright.dev) test suite. It checks
+things that show up on almost any website — header nav, footer, contact form, meta
+tags, accessibility, responsive layout, broken links, console/network errors — so a
+new Triad project can start with a working test suite on day one instead of writing
+one from scratch.
 
-Companion to [triadtest](../triadtest), which is the fully-built-out example of these
-same conventions applied to one specific site.
+Nothing in here hardcodes a specific site's copy, routes, or nav links — every test
+reads its expectations from a config file (see "How it works" below), so pointing
+this at a different site is a config change, not a rewrite.
 
-## How this is different from a normal test repo
+Companion to [triadtest](../triadtest), a sibling repo that applies these same
+conventions to one specific site in full — including an authenticated-flow setup
+this generic blueprint doesn't ship by default (see step 4 under "Adding a new
+site").
 
-Nothing here hardcodes a site's copy or routes. Every spec reads its expectations
-from **`config/site.config.ts`** — nav items, form fields, pages to check for SEO/a11y,
-link-crawl targets, performance budget. Point that one file at a new site and the
-suites that apply light up; leave a section empty and the corresponding suite
-`test.skip()`s itself with a reason instead of failing.
-
-## Setup
+## Quick start
 
 ```bash
 npm install
 npx playwright install   # download the browser binaries (first time only)
-cp .env.example .env     # then set PW_BASE_URL
+npm run test:triad       # runs the full suite against triad.tech
 ```
 
-## Testing multiple sites
+`triad.tech` and `sunshinetechserv.com` are already configured (see `config/sites/`),
+so there's nothing else to set up to see this run for real. `npm run report` opens
+the HTML report from the last run.
 
-`config/site.config.ts` no longer holds a site's settings directly — it picks
-one out of `config/sites/` based on the `SITE` environment variable, so you
-can keep more than one site's settings around instead of overwriting one every
-time you point this at somewhere new:
+## How it works
+
+Every spec reads its expectations from **`config/site.config.ts`**, which picks one
+file out of `config/sites/` based on the `SITE` environment variable:
 
 ```bash
 npm run test:triad       # SITE=triad, tests triad.tech
@@ -38,29 +38,41 @@ npm run test:sunshine    # SITE=sunshine, tests sunshinetechserv.com
 npm test                 # SITE unset -> defaults to "triad"
 ```
 
-To add another site, run:
+Each `config/sites/<name>.ts` holds one site's nav items, form fields, pages to check
+for SEO/accessibility, link-crawl targets, and performance budget. Leave a section
+empty and the corresponding suite `test.skip()`s itself with a reason instead of
+failing — so a half-configured site still runs whatever suites *do* have config.
+
+No page object, fixture, or spec in this repo hardcodes a site — they all import
+`siteConfig` from `config/site.config.ts` and never know which real site is behind
+it.
+
+Each site's `baseURL` is a real URL baked into its config file, so no extra setup is
+needed to test either site above. Only set `PW_BASE_URL` — copy `.env.example` to
+`.env` and fill it in, or export it directly — when you need to override that
+default, e.g. pointing CI at a staging environment instead of production.
+
+## Adding a new site
 
 ```bash
 npm run add-site <shortname> https://example.com
 ```
 
-This scaffolds `config/sites/<name>.ts` with a `TODO` on every field, wires it
-into the `sites` map in `config/site.config.ts`, and adds a `test:<name>` npm
-script — the three mechanical steps that are easy to get subtly wrong by hand
-and don't need a human to do at all. It deliberately does *not* guess at the
-site's real nav links, form fields, or pages to check — open the scaffolded
-file and fill those in by actually looking at the live site (or ask an AI
-session with browser access to do it, the way triad.tech and Sunshine's
-configs were filled in). Nothing else in the repo — no page object, fixture,
-or spec — needs to change; they all still just import `siteConfig` from
-`config/site.config.ts` and never know which real site is behind it.
+This scaffolds `config/sites/<name>.ts` with a `TODO` on every field, registers it in
+the `sites` map in `config/site.config.ts`, and adds a matching `test:<name>` npm
+script — the three mechanical steps that are easy to get subtly wrong by hand and
+don't need a human to do at all. It deliberately does *not* guess at the site's real
+nav links, form fields, or pages to check.
 
-## Adapting this to a new site
+From there:
 
-1. Add a **`config/sites/<name>.ts`** (see above): set `baseURL`, `smokeRoutes`,
-   `nav.items`, `contactForm`, `seo.pagesToCheck`, `accessibility.pagesToCheck`,
-   and `linkCheck.pagesToCrawl` to match the real site.
-2. Run it with `SITE=<name> npm test` — the suites that now have config will run; the rest stay skipped.
+1. Open the new `config/sites/<name>.ts` and fill in every `TODO` by actually looking
+   at the live site: `baseURL`, `smokeRoutes`, `nav.items`, `contactForm`,
+   `seo.pagesToCheck`, `accessibility.pagesToCheck`, `linkCheck.pagesToCrawl`, and
+   `performance.loadBudgetMs`. (Or ask an AI session with browser access to do it —
+   this is how triad.tech and Sunshine's configs were filled in.)
+2. Run it with `npm run test:<name>` (or `SITE=<name> npm test`) — the suites that
+   now have config will run; the rest stay skipped.
 3. If the header/footer/contact form markup doesn't match the generic ARIA-role
    assumptions in `pages/headerPage.ts`, `pages/footerPage.ts`, or
    `pages/contactFormPage.ts`, adjust the locator there — every spec that uses it
@@ -137,3 +149,4 @@ you want CI to target.
 
 See [TESTS.md](TESTS.md) for what each suite checks and why, and
 [FINDINGS.md](FINDINGS.md) for the latest run's results against the live site.
+# playwright-blueprint
