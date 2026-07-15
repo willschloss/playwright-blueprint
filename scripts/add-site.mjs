@@ -10,36 +10,36 @@
  * only removes the busywork of wiring a new file into two other files by
  * hand, which is easy to get subtly wrong and doesn't need a human at all.
  *
- * Usage: node scripts/add-site.mjs --name <shortname> --url <https://...>
+ * Usage: node scripts/add-site.mjs <shortname> <https://...>
+ *
+ * Plain positional args on purpose, not --name/--url flags: npm run swallows
+ * flags as its own options unless you remember the "--" separator (e.g.
+ * `npm run add-site -- --name x`), which is a common footgun. Positional
+ * args pass through `npm run add-site <shortname> <url>` with no separator
+ * needed.
  */
-import { parseArgs } from "node:util";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-const { values } = parseArgs({
-  options: {
-    name: { type: "string" },
-    url: { type: "string" },
-  },
-});
+const [rawName, rawUrl] = process.argv.slice(2);
 
-if (!values.name || !values.url) {
-  console.error("Usage: node scripts/add-site.mjs --name <shortname> --url <https://...>");
+if (!rawName || !rawUrl) {
+  console.error("Usage: npm run add-site <shortname> <https://...>");
   process.exit(1);
 }
 
-const name = values.name.trim();
+const name = rawName.trim();
 if (!/^[a-z][a-z0-9]*$/.test(name)) {
-  console.error(`--name "${name}" must be lowercase letters/numbers only, starting with a letter (it becomes a filename and a JS identifier).`);
+  console.error(`"${name}" must be lowercase letters/numbers only, starting with a letter (it becomes a filename and a JS identifier).`);
   process.exit(1);
 }
 
 let url;
 try {
-  url = new URL(values.url);
+  url = new URL(rawUrl);
 } catch {
-  console.error(`--url "${values.url}" doesn't look like a valid URL (needs the https:// part).`);
+  console.error(`"${rawUrl}" doesn't look like a valid URL (needs the https:// part).`);
   process.exit(1);
 }
 

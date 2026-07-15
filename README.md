@@ -41,7 +41,7 @@ npm test                 # SITE unset -> defaults to "triad"
 To add another site, run:
 
 ```bash
-npm run add-site -- --name <shortname> --url https://example.com
+npm run add-site <shortname> https://example.com
 ```
 
 This scaffolds `config/sites/<name>.ts` with a `TODO` on every field, wires it

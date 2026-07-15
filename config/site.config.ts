@@ -20,10 +20,11 @@
  */
 
 import { siteConfig as sunshine } from "./sites/sunshine";
+import { siteConfig as triad } from "./sites/triad";
 
 export * from "./sites/types";
 
-const sites = { sunshine };
+const sites = { sunshine, triad };
 
 const requested = process.env.SITE ?? "sunshine";
 

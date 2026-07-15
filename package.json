@@ -13,7 +13,8 @@
     "test:sunshine": "SITE=sunshine playwright test",
     "add-site": "node scripts/add-site.mjs",
     "report": "playwright show-report",
-    "codegen": "playwright codegen ${PW_BASE_URL:-http://localhost:3000}"
+    "codegen": "playwright codegen ${PW_BASE_URL:-http://localhost:3000}",
+    "test:triad": "SITE=triad playwright test"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
